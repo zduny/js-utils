@@ -1,5 +1,5 @@
 use fluvio_wasm_timer::Delay;
-use std::{error::Error, time::Duration};
+use std::{error::Error, time::Duration, fmt::Display};
 use wasm_bindgen::prelude::*;
 use web_sys::Window;
 
@@ -63,4 +63,23 @@ pub async fn wait_a_second() -> Result<(), Box<dyn Error>> {
 
 pub async fn wait(duration: Duration) -> Result<(), Box<dyn Error>> {
     Ok(Delay::new(duration).await?)
+}
+
+#[derive(Debug)]
+pub struct JsError {
+    value: JsValue,
+}
+
+impl Display for JsError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self.value)
+    }
+}
+
+impl std::error::Error for JsError {}
+
+impl From<JsValue> for JsError {
+    fn from(value: JsValue) -> Self {
+        JsError { value }
+    }
 }
