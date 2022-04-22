@@ -1,5 +1,5 @@
-use fluvio_wasm_timer::Delay;
-use std::{error::Error, time::Duration, fmt::Display};
+use std::fmt::Display;
+
 use wasm_bindgen::prelude::*;
 use web_sys::Window;
 
@@ -55,14 +55,6 @@ macro_rules! closure {
 
 pub fn window() -> Window {
     web_sys::window().unwrap()
-}
-
-pub async fn wait_a_second() -> Result<(), Box<dyn Error>> {
-    wait(Duration::from_secs(1)).await
-}
-
-pub async fn wait(duration: Duration) -> Result<(), Box<dyn Error>> {
-    Ok(Delay::new(duration).await?)
 }
 
 #[derive(Debug)]
