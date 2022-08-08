@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use wasm_bindgen::prelude::*;
-use web_sys::Window;
+use web_sys::{Window, Document, HtmlElement};
 
 pub fn set_panic_hook() {
     console_error_panic_hook::set_once();
@@ -58,7 +58,17 @@ macro_rules! closure {
 }
 
 pub fn window() -> Window {
-    web_sys::window().unwrap()
+    web_sys::window().expect("no global window exists")
+}
+
+pub fn document() -> Document {
+    window()
+        .document()
+        .expect("should have a document on window")
+}
+
+pub fn body() -> HtmlElement {
+    document().body().expect("document should have a body")
 }
 
 #[derive(Debug)]
