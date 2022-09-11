@@ -1,6 +1,21 @@
 //! Useful utilities to make development of browser-targeted Rust applications
 //! slightly less painful.
 
+#[cfg(feature = "spawn")]
+pub mod spawn;
+#[cfg(feature = "spawn")]
+pub use spawn::spawn;
+
+#[cfg(feature = "sleep")]
+pub mod sleep;
+#[cfg(feature = "sleep")]
+pub use sleep::sleep;
+
+#[cfg(feature = "queue")]
+pub mod queue;
+#[cfg(feature = "queue")]
+pub use queue::Queue;
+
 use std::fmt::Display;
 
 use wasm_bindgen::prelude::*;
@@ -111,5 +126,28 @@ impl std::error::Error for JsError {}
 impl From<JsValue> for JsError {
     fn from(value: JsValue) -> Self {
         JsError(value)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{body, document, window};
+    use wasm_bindgen_test::{wasm_bindgen_test, wasm_bindgen_test_configure};
+
+    wasm_bindgen_test_configure!(run_in_browser);
+
+    #[wasm_bindgen_test]
+    fn test_window() {
+        window();
+    }
+
+    #[wasm_bindgen_test]
+    fn test_body() {
+        body();
+    }
+
+    #[wasm_bindgen_test]
+    fn test_document() {
+        document();
     }
 }
