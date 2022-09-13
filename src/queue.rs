@@ -1,10 +1,9 @@
 //! Async queue.
 
-use futures::{future::FusedFuture, stream::FusedStream, Future};
+use futures::{future::FusedFuture, Future};
 use std::{
     collections::VecDeque,
     pin::Pin,
-    rc::Rc,
     sync::Mutex,
     task::{Context, Poll, Waker},
 };
@@ -83,14 +82,6 @@ impl<T> Queue<T> {
         self.state.lock().unwrap().buffer.pop_back()
     }
 
-    /// Creates stream that will pop elements off the queue.
-    ///
-    /// **Note**: this stream does NOT finish when queue becomes empty,
-    /// it finishes when queue is dropped.
-    pub fn stream(self: Rc<Self>) -> Stream<T> {
-        Stream { queue: Some(self) }
-    }
-
     /// Returns count of elements currently in the queue.
     pub fn len(&self) -> usize {
         self.state.lock().unwrap().buffer.len()
@@ -153,49 +144,10 @@ impl<'a, T> FusedFuture for Pop<'a, T> {
     }
 }
 
-/// Stream returned by [stream] method.
-///
-/// [stream]: Queue::stream
-pub struct Stream<T> {
-    queue: Option<Rc<Queue<T>>>,
-}
-
-impl<T> futures::stream::Stream for Stream<T> {
-    type Item = T;
-
-    fn poll_next(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Option<Self::Item>> {
-        if let Some(queue) = &self.queue {
-            let mut state = queue.state.lock().unwrap();
-            match state.buffer.pop_back() {
-                Some(value) => Poll::Ready(Some(value)),
-                None => {
-                    if Rc::strong_count(queue) == 1 {
-                        drop(state);
-                        self.queue = None;
-                        Poll::Ready(None)
-                    } else {
-                        state.wakers.push_front(cx.waker().clone());
-                        Poll::Pending
-                    }
-                }
-            }
-        } else {
-            Poll::Ready(None)
-        }
-    }
-}
-
-impl<T> FusedStream for Stream<T> {
-    fn is_terminated(&self) -> bool {
-        self.queue.is_none()
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use std::{rc::Rc, time::Duration};
 
-    use futures::stream::StreamExt;
     use wasm_bindgen_test::wasm_bindgen_test;
 
     use crate::{sleep, spawn, Queue};
@@ -246,22 +198,6 @@ mod tests {
         queue.push(1);
         queue.push(2);
         queue.push(3);
-
-        let stream = queue.clone().stream();
-        queue.push(4);
-        drop(queue);
-
-        assert_eq!(stream.collect::<Vec<u32>>().await, vec![1, 2, 3, 4]);
-
-        let queue = Rc::new(Queue::new());
-        let stream = queue.clone().stream();
-        let queue_clone = queue.clone();
-        spawn(async move { queue_clone.push(3); });
-        queue.push(1);
-        queue.push(2);
-        drop(queue);
-
-        assert_eq!(stream.collect::<Vec<u32>>().await, vec![1, 2, 3]);
     }
 
     #[wasm_bindgen_test]
@@ -280,10 +216,5 @@ mod tests {
 
         assert_eq!(queue.len(), 3);
         assert!(queue.is_full());
-
-        queue.push(4);
-        queue.push(5);
-
-        assert_eq!(Rc::new(queue).stream().collect::<Vec<u32>>().await, vec![3, 4, 5]);
     }
 }
