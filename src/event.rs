@@ -142,7 +142,7 @@ where
 
 impl<T> Stream for T
 where
-    T: AsRef<EventTarget>,
+    T: When,
 {
     fn listen<E: FromWasmAbi + 'static>(
         self: &Rc<Self>,
@@ -195,7 +195,7 @@ mod tests {
             .unwrap();
         body.click();
         sleep(Duration::from_secs_f32(1.1)).await;
-        
+
         assert_eq!(result.take().unwrap(), "Done!");
     }
 
