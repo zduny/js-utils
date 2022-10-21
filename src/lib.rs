@@ -16,6 +16,9 @@ pub mod queue;
 #[cfg(feature = "queue")]
 pub use queue::Queue;
 
+#[cfg(feature = "event")]
+pub mod event;
+
 use std::fmt::Display;
 
 use wasm_bindgen::prelude::*;
