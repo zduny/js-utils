@@ -20,7 +20,7 @@ pub trait When: AsRef<EventTarget> + Sized {
     ) -> Result<EventListener<Self, E>, JsError>;
 }
 
-pub trait Stream: AsRef<EventTarget> + Sized {
+pub trait Stream: When {
     fn listen<E: FromWasmAbi + 'static>(
         self: &Rc<Self>,
         event_type: &'static str,
@@ -77,7 +77,7 @@ where
 #[derive(Debug)]
 pub struct EventStream<T, E>
 where
-    T: AsRef<EventTarget>,
+    T: When,
 {
     state: Rc<RefCell<State<E>>>,
     listener: Option<EventListener<T, E>>,
