@@ -5,6 +5,10 @@ https://crates.io/crates/js-utils
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/O5O31JYZ4)
 
+## development
+
+Use `test.sh` script to run tests.
+
 ## see also
 [wasm-bindgen](https://github.com/rustwasm/wasm-bindgen)
 
