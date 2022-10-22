@@ -34,7 +34,7 @@ pub trait Stream: When {
 }
 
 /// Listener of events.
-/// 
+///
 /// Drop to remove event listener.
 #[derive(Debug)]
 pub struct EventListener<T, E>
@@ -98,7 +98,7 @@ where
     T: AsRef<EventTarget>,
 {
     /// Stop listening to events.
-    /// 
+    ///
     /// This means stream will terminate as soon as all received before events are consumed.
     pub fn stop(&mut self) {
         self.listener = None;
@@ -126,20 +126,18 @@ where
         let mut state = self.state.borrow_mut();
         if let Some(event) = state.queue.pop_front() {
             Poll::Ready(Some(event))
+        } else if self.listener.is_none() {
+            Poll::Ready(None)
         } else {
-            if self.listener.is_none() {
-                Poll::Ready(None)
-            } else {
-                let new_waker = cx.waker();
-                if let Some(waker) = &mut state.waker {
-                    if !waker.will_wake(new_waker) {
-                        state.waker = Some(new_waker.clone());
-                    }
-                } else {
+            let new_waker = cx.waker();
+            if let Some(waker) = &mut state.waker {
+                if !waker.will_wake(new_waker) {
                     state.waker = Some(new_waker.clone());
                 }
-                Poll::Pending
+            } else {
+                state.waker = Some(new_waker.clone());
             }
+            Poll::Pending
         }
     }
 }
