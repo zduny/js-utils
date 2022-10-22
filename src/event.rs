@@ -179,7 +179,7 @@ mod tests {
     use crate::{
         body,
         event::{EventStream, Stream, When},
-        sleep,
+        sleep, spawn,
     };
 
     #[wasm_bindgen_test]
@@ -202,6 +202,18 @@ mod tests {
     #[wasm_bindgen_test]
     async fn test_event_stream() {
         let body = Rc::new(body());
+
+        let body_clone = body.clone();
+        let handle = spawn(async move {
+            let mut stream: EventStream<_, MouseEvent> = body_clone.listen("click").unwrap();
+            stream.next().await.unwrap();
+            stream.next().await.unwrap();
+            stream.stop();
+        });
+        sleep(Duration::from_secs_f32(0.1)).await;
+        body.click();
+        body.click();
+        let _ = handle.await;
 
         let mut stream: EventStream<_, MouseEvent> = body.listen("click").unwrap();
         body.click();
