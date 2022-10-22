@@ -1,3 +1,5 @@
+//! Event-related utilities.
+
 use std::{
     cell::RefCell,
     collections::VecDeque,
@@ -12,7 +14,9 @@ use web_sys::EventTarget;
 
 use crate::{closure, JsError};
 
+/// Trait for listening to events with a callback.
 pub trait When: AsRef<EventTarget> + Sized {
+    /// Run `callback` when given event type occurs.
     fn when<E: FromWasmAbi + 'static, F: FnMut(E) + 'static>(
         self: &Rc<Self>,
         event_type: &'static str,
@@ -20,13 +24,18 @@ pub trait When: AsRef<EventTarget> + Sized {
     ) -> Result<EventListener<Self, E>, JsError>;
 }
 
+/// Trait for creating event streams.
 pub trait Stream: When {
+    /// Create stream of given event type.
     fn listen<E: FromWasmAbi + 'static>(
         self: &Rc<Self>,
         event_type: &'static str,
     ) -> Result<EventStream<Self, E>, JsError>;
 }
 
+/// Listener of events.
+/// 
+/// Drop to remove event listener.
 #[derive(Debug)]
 pub struct EventListener<T, E>
 where
@@ -74,6 +83,7 @@ where
     }
 }
 
+/// Stream of events.
 #[derive(Debug)]
 pub struct EventStream<T, E>
 where
@@ -87,6 +97,9 @@ impl<T, E> EventStream<T, E>
 where
     T: AsRef<EventTarget>,
 {
+    /// Stop listening to events.
+    /// 
+    /// This means stream will terminate as soon as all received before events are consumed.
     pub fn stop(&mut self) {
         self.listener = None;
         if let Some(waker) = &self.state.borrow().waker {
