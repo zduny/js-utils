@@ -1,14 +1,20 @@
 [package]
 name = "js-utils"
 version = "0.1.0"
+authors = ["zduny <dzduniak@gmail.com>"]
 edition = "2021"
+description = "Useful utilities to make development of browser-targeted Rust applications slightly less painful."
+license = "Apache-2.0"
+repository = "https://github.com/zduny/js-utils"
+documentation = "https://docs.rs/js-utils/"
+keywords = ["js", "javascript", "wasm", "browser", "web"]
 
 [features]
 default = ["panic_hook", "spawn", "sleep", "queue", "event"]
 spawn = ["futures", "wasm-bindgen-futures"]
 sleep = ["futures", "fluvio-wasm-timer"]
 queue = []
-event = ["queue"]
+event = []
 panic_hook = ["console_error_panic_hook"]
 
 [dependencies]
