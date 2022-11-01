@@ -1,7 +1,7 @@
 //! Sleeping.
 
-use fluvio_wasm_timer::Delay;
-pub use fluvio_wasm_timer::Instant;
+use zduny_wasm_timer::Delay;
+pub use zduny_wasm_timer::Instant;
 use futures::{Future, FutureExt};
 use std::{
     pin::Pin,
