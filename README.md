@@ -5,6 +5,10 @@ https://crates.io/crates/js-utils
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/O5O31JYZ4)
 
+## example
+
+See [rust-webapp-template](https://github.com/zduny/rust-webapp-template).
+
 ## development
 
 Use `test.sh` script to run tests.
