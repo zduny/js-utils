@@ -1,13 +1,13 @@
 //! Sleeping.
 
-use zduny_wasm_timer::Delay;
-pub use zduny_wasm_timer::Instant;
 use futures::{Future, FutureExt};
 use std::{
     pin::Pin,
     task::{Context, Poll},
     time::Duration,
 };
+use zduny_wasm_timer::Delay;
+pub use zduny_wasm_timer::Instant;
 
 /// Waits until `duration` has elapsed.
 ///
@@ -27,6 +27,7 @@ pub fn sleep_until(deadline: Instant) -> Sleep {
 }
 
 /// Future returned by [`sleep`] and [`sleep_until`].
+#[derive(Debug)]
 pub struct Sleep {
     deadline: Instant,
     delay: Delay,
