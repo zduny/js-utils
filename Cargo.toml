@@ -1,6 +1,6 @@
 [package]
 name = "js-utils"
-version = "0.1.3"
+version = "0.1.4"
 authors = ["zduny <dzduniak@gmail.com>"]
 edition = "2021"
 description = "Useful utilities to make development of browser-targeted Rust applications slightly less painful."
@@ -18,14 +18,14 @@ event = ["futures"]
 panic_hook = ["console_error_panic_hook"]
 
 [dependencies]
-wasm-bindgen = "0.2.83"
+wasm-bindgen = "0.2.87"
 console_error_panic_hook = { version = "0.1.7", optional = true }
-futures = { version = "0.3.25", optional = true }
-wasm-bindgen-futures = { version = "0.4.33", optional = true }
-zduny-wasm-timer = { version = "0.2.6", optional = true }
+futures = { version = "0.3.28", optional = true }
+wasm-bindgen-futures = { version = "0.4.37", optional = true }
+zduny-wasm-timer = { version = "0.2.7", optional = true }
 
 [dependencies.web-sys]
-version = "0.3.60"
+version = "0.3.64"
 features = [
     "Window",
     "Document",
@@ -33,8 +33,8 @@ features = [
 ]
 
 [dev-dependencies]
-wasm-bindgen = "0.2.83"
-wasm-bindgen-test = "0.3.33"
+wasm-bindgen = "0.2.87"
+wasm-bindgen-test = "0.3.37"
 
 [dev-dependencies.web-sys]
 version = "0.3.60"
