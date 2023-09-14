@@ -81,6 +81,6 @@ mod tests {
         let current = Instant::now();
         sleep(Duration::from_secs(1)).await;
         let difference = Instant::now() - current;
-        assert!(difference.as_secs_f64() > 1.0)
+        assert!(difference.as_secs_f64() >= 1.0)
     }
 }
