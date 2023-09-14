@@ -1,4 +1,9 @@
 # js-utils
+
+[![Test Status](https://github.com/zduny/js-utils/actions/workflows/rust.yml/badge.svg)](https://github.com/zduny/js-utils/actions)
+[![Crate](https://img.shields.io/crates/v/js-utils.svg)](https://crates.io/crates/js-utils)
+[![API](https://docs.rs/js-utils/badge.svg)](https://docs.rs/js-utils)
+
 Useful utilities to make development of browser-targeted Rust applications slightly less painful.
 
 https://crates.io/crates/js-utils
