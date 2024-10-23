@@ -1,6 +1,6 @@
 [package]
 name = "js-utils"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["zduny <dzduniak@gmail.com>"]
 edition = "2021"
 description = "Useful utilities to make development of browser-targeted Rust applications slightly less painful."
