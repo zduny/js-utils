@@ -51,8 +51,7 @@ extern "C" {
 macro_rules! console_log {
     ($($t:tt)*) => {
         {
-            use $crate::log;
-            (log(&format_args!($($t)*).to_string()))
+            ($crate::log(&format_args!($($t)*).to_string()))
         }
     }
 }
@@ -62,8 +61,7 @@ macro_rules! console_log {
 macro_rules! console_warn {
     ($($t:tt)*) => {
         {
-            use $crate::warn;
-            (warn(&format_args!($($t)*).to_string()))
+            ($crate::warn(&format_args!($($t)*).to_string()))
         }
     }
 }
@@ -73,8 +71,7 @@ macro_rules! console_warn {
 macro_rules! console_error {
     ($($t:tt)*) => {
         {
-            use $crate::error;
-            (error(&format_args!($($t)*).to_string()))
+            ($crate::error(&format_args!($($t)*).to_string()))
         }
     }
 }
@@ -83,8 +80,7 @@ macro_rules! console_error {
 #[macro_export]
 macro_rules! closure {
     ($expression:expr) => {{
-        use wasm_bindgen::prelude::Closure;
-        Closure::wrap(Box::new($expression) as Box<dyn FnMut(_)>)
+        wasm_bindgen::prelude::Closure::wrap(Box::new($expression) as Box<dyn FnMut(_)>)
     }};
 }
 
