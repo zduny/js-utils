@@ -18,7 +18,7 @@ use crate::{closure, JsError};
 pub trait When: AsRef<EventTarget> + Sized {
     /// Run `callback` when given event type occurs.
     fn when<E: FromWasmAbi + 'static, F: FnMut(E) + 'static>(
-        self: &Rc<Self>,
+        self: &Self,
         event_type: &'static str,
         callback: F,
     ) -> Result<EventListener<Self, E>, JsError>;
@@ -28,7 +28,7 @@ pub trait When: AsRef<EventTarget> + Sized {
 pub trait Stream: When {
     /// Create stream of given event type.
     fn listen<E: FromWasmAbi + 'static>(
-        self: &Rc<Self>,
+        self: &Self,
         event_type: &'static str,
     ) -> Result<EventStream<Self, E>, JsError>;
 }
@@ -42,7 +42,7 @@ where
     T: AsRef<EventTarget>,
 {
     event_type: &'static str,
-    target: Rc<T>,
+    target: T,
     closure: Closure<dyn FnMut(E)>,
 }
 
@@ -54,7 +54,6 @@ where
         let _ = self
             .target
             .as_ref()
-            .as_ref()
             .remove_event_listener_with_callback(
                 self.event_type,
                 self.closure.as_ref().unchecked_ref(),
@@ -64,16 +63,15 @@ where
 
 impl<T> When for T
 where
-    T: AsRef<EventTarget>,
+    T: AsRef<EventTarget> + Clone,
 {
     fn when<E: FromWasmAbi + 'static, F: FnMut(E) + 'static>(
-        self: &Rc<Self>,
+        self: &Self,
         event_type: &'static str,
         callback: F,
     ) -> Result<EventListener<Self, E>, JsError> {
         let closure = closure!(callback);
         self.as_ref()
-            .as_ref()
             .add_event_listener_with_callback(event_type, closure.as_ref().unchecked_ref())?;
         Ok(EventListener {
             event_type,
@@ -95,7 +93,7 @@ where
 
 impl<T, E> EventStream<T, E>
 where
-    T: AsRef<EventTarget>,
+    T: AsRef<EventTarget> + Clone,
 {
     /// Stop listening to events.
     ///
@@ -114,11 +112,11 @@ struct State<E> {
     waker: Option<Waker>,
 }
 
-impl<T, E> Unpin for EventStream<T, E> where T: AsRef<EventTarget> {}
+impl<T, E> Unpin for EventStream<T, E> where T: AsRef<EventTarget> + Clone {}
 
 impl<T, E> futures::Stream for EventStream<T, E>
 where
-    T: AsRef<EventTarget>,
+    T: AsRef<EventTarget> + Clone,
 {
     type Item = E;
 
@@ -144,7 +142,7 @@ where
 
 impl<T, E> FusedStream for EventStream<T, E>
 where
-    T: AsRef<EventTarget>,
+    T: AsRef<EventTarget> + Clone,
 {
     fn is_terminated(&self) -> bool {
         self.listener.is_none() && self.state.borrow().queue.is_empty()
@@ -156,7 +154,7 @@ where
     T: When,
 {
     fn listen<E: FromWasmAbi + 'static>(
-        self: &Rc<Self>,
+        self: &Self,
         event_type: &'static str,
     ) -> Result<EventStream<Self, E>, JsError> {
         let state = Rc::new(RefCell::new(State {
@@ -195,7 +193,7 @@ mod tests {
 
     #[wasm_bindgen_test]
     async fn test_event_listener() {
-        let body = Rc::new(body());
+        let body = body();
 
         let result = Rc::new(Cell::new(None));
         let result_clone = result.clone();
@@ -212,7 +210,7 @@ mod tests {
 
     #[wasm_bindgen_test]
     async fn test_event_stream() {
-        let body = Rc::new(body());
+        let body = body();
 
         let body_clone = body.clone();
         let handle = spawn(async move {
